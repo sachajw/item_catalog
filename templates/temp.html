@@ -1,0 +1,43 @@
+<!--  <li> {% if current_user.is_authenticated %}
+          <a href="{{ url_for('authentication.log_out_user') }}"> SignOut </a>
+        {% else %}
+            <a href="{{ url_for('authentication.do_the_login') }}"> SignIn </a>
+        {% endif %}
+  </li>
+  <li>
+      <a href="">
+          {% if current_user.is_authenticated %}
+              Logged-In as <b style="color: deeppink"> {{ current_user.user_name.title() }} </b>
+          {% else %}
+              Not Logged-In
+          {% endif %}
+      </a>
+  </li>-->
+  # Flask Forms
+  class RegistrationForm(FlaskForm):
+
+      name = StringField('Name', validators=[DataRequired(), Length(3,16, message='between 3 to 16 characters')])
+      email = StringField('Email', validators=[DataRequired(), Email()])
+      password = PasswordField('Password', validators=[DataRequired(), Length(8), EqualTo('confirm', message='password must match')])
+      confirm = PasswordField('Confirm', validators=[DataRequired()])
+      submit = SubmitField('Register')
+
+
+      existing_username = session.query(User).filter_by(user_name=name).first()
+
+      class User(UserMixin):
+          __tablename__ = 'users'
+          id = Column(Integer, primary_key=True)
+          user_name = Column(String(20))
+          user_email = Column(String(60), unique=True, index=True)
+          user_password = Column(String(80))
+          registration_date = Column(String(20), nullable=False)
+
+  class RegistrationForm(FlaskForm):
+
+      name = StringField('Name', validators=[DataRequired(), Length(3, 15, message='between 3 to 15 characters')])
+      #email = StringField('E-mail', validators=[DataRequired(), Email(), email_exists])
+      email = StringField('E-mail', validators=[DataRequired(), Email()])
+      password = PasswordField('Password', validators=[DataRequired(), Length(5), EqualTo('confirm', message='password must match')])
+      confirm = PasswordField('Confirm', validators=[DataRequired()])
+      submit = SubmitField('Register')
