@@ -33,7 +33,7 @@
                             {% else %}
                               <a href="{{ url_for('do_the_login') }}"> SignIn </a>
                             {% endif %}
-                      </li>
+                      <li><a href="{{ url_for('showLogin')}}"> Use Google Sign In Here</a></li>
                       <li>
                             <a href="">
                                 {% if current_user.is_authenticated %}

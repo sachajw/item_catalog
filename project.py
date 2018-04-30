@@ -195,15 +195,18 @@ def do_the_login():
         return redirect(url_for('display_books'))
     return render_template('login.html', form=form)
 
+# Google Authorization Begins
+
 # Create anti-forgery state token
+@app.route('/glogin')
 def showLogin():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
     login_session['state'] = state
     # return "The current session state is %s" % login_session['state']
-    return render_template('login.html', STATE=state)
+    return render_template('glogin.html', STATE=state)
+    #return render_template('gauth.html', STATE=state)
 
-# Google Sign In Begins
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
     # Validate state token
@@ -286,7 +289,7 @@ def gconnect():
     flash("you are now logged in as %s" % login_session['username'])
     print "done!"
     return output
-# Google Sign In Ends
+# Google Authorization Ends
 
 @app.route('/logout')
 @login_required
