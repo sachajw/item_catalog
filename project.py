@@ -1,10 +1,14 @@
-from flask import Flask , render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask , render_template, request, redirect, url_for, flash, \
+   jsonify
 from flask_wtf import FlaskForm
 from flask_wtf.csrf import CSRFProtect, CSRFError
-from wtforms import StringField, SubmitField, PasswordField, BooleanField, IntegerField, FloatField
-from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
+from wtforms import StringField, SubmitField, PasswordField, BooleanField, \
+   IntegerField, FloatField
+from wtforms.validators import DataRequired, Length, Email, EqualTo, \
+   ValidationError
 from flask_bootstrap import Bootstrap
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from flask_login import LoginManager, UserMixin, login_user, logout_user, \
+   login_required, current_user
 from flask import session as login_session
 from flask_bcrypt import Bcrypt
 from sqlalchemy import Column, ForeignKey, Integer, String
@@ -42,6 +46,7 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
+# App configuration
 db = SQLAlchemy()
 bootstrap = Bootstrap(app)
 login_manager = LoginManager(app)
@@ -106,6 +111,7 @@ class EditBookForm(FlaskForm):
     avg_rating = StringField('Average Rating Out of 5',
                              validators=[DataRequired()])
     format = StringField('Format', validators=[DataRequired()])
+    image = StringField('Image')
     num_pages = StringField('Pages', validators=[DataRequired()])
     submit = SubmitField('Update')
 
@@ -138,9 +144,9 @@ class Book(db.Model):
     author = db.Column(db.String(350))
     avg_rating = db.Column(db.Float)
     format = db.Column(db.String(50))
-    image = db.Column(db.String(100), unique=True)
+    image = db.Column(db.String(250))
     num_pages = db.Column(db.Integer)
-    pub_date = db.Column(db.String(50), default=datetime.now())
+    pub_date = db.Column(db.String(50))
 
     # Relationship
     pub_id = db.Column(db.Integer, db.ForeignKey('publication.id'))
@@ -205,7 +211,6 @@ def showLogin():
     login_session['state'] = state
     # return "The current session state is %s" % login_session['state']
     return render_template('glogin.html', STATE=state)
-    #return render_template('gauth.html', STATE=state)
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
@@ -289,6 +294,37 @@ def gconnect():
     flash("you are now logged in as %s" % login_session['username'])
     print "done!"
     return output
+
+@app.route('/gdisconnect')
+def gdisconnect():
+    access_token = login_session.get('access_token')
+    if access_token is None:
+        print 'Access Token is None'
+        response = make_response(json.dumps('Current user not connected.'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    print 'In gdisconnect access token is %s', access_token
+    print 'User name is: '
+    print login_session['username']
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % login_session['access_token']
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[0]
+    print 'result is '
+    print result
+    if result['status'] == '200':
+        del login_session['access_token']
+        del login_session['gplus_id']
+        del login_session['username']
+        del login_session['email']
+        del login_session['picture']
+        response = make_response(json.dumps('Successfully disconnected.'), 200)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    else:
+        response = make_response(json.dumps('Failed to revoke token for given user.', 400))
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
 # Google Authorization Ends
 
 @app.route('/logout')
@@ -333,6 +369,7 @@ def edit_book(book_id):
         book.author = form.author.data
         book.avg_rating = form.avg_rating.data
         book.format = form.format.data
+        book.image = form.image.data
         book.num_pages = form.num_pages.data
         db.session.add(book)
         db.session.commit()

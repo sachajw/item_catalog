@@ -26,7 +26,7 @@ class Book(Base):
     author = Column(String(350))
     avg_rating = Column(String(20))
     format = Column(String(50))
-    image = Column(String(100), unique=True)
+    image = Column(String(250))
     num_pages = Column(Integer)
     pub_date = Column(String(20))
     pub_id = Column(Integer, ForeignKey('publication.id'))

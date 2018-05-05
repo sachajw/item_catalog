@@ -5,10 +5,8 @@
       <div class="row">
           {% for book in books %}
               <div class="col-md-4">
-                  <!--<img src="static/img/{{ book.image }}"
-                  alt="book-img" height="200" width="190" class="image-rounded" />-->
-                  <!--<img src="url_for{{ book.image }}"
-                  alt="book-img" height="200" width="190" class="image-rounded" />-->
+                  <img src="static/img/{{ book.image }}"
+                  alt="book-img" height="200" width="200" class="image-rounded" />
                   <h4>Title: {{ book.title }}</h4>
                   <p>Authors: {{ book.author }}</p>
                   <p>Format: {{ book.format }}</p>
