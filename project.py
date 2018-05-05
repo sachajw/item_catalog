@@ -108,12 +108,12 @@ def load_user(id):
 class EditBookForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired()])
     author = StringField('Author', validators=[DataRequired()])
-    genre = StringField('Genre',
-                             validators=[DataRequired()])
+    genre = StringField('Genre', validators=[DataRequired()])
     format = StringField('Format', validators=[DataRequired()])
     image = StringField('Image')
     num_pages = StringField('Pages', validators=[DataRequired()])
     pub_date = StringField('Publication Date', validators=[DataRequired()])
+    pub_id = IntegerField('PublisherID', validators=[DataRequired()])
     submit = SubmitField('Update')
 
 class CreateBookForm(FlaskForm):
@@ -374,6 +374,7 @@ def edit_book(book_id):
         book.image = form.image.data
         book.num_pages = form.num_pages.data
         book.pub_date = form.pub_date.data
+        book.pub_id = form.pub_id.data
         db.session.add(book)
         db.session.commit()
         flash('book edited successfully')
