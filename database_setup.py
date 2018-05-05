@@ -24,7 +24,7 @@ class Book(Base):
     id = Column(Integer, primary_key=True)
     title = Column(String(500), nullable=False, index=True)
     author = Column(String(350))
-    avg_rating = Column(String(20))
+    genre = Column(String(50))
     format = Column(String(50))
     image = Column(String(250))
     num_pages = Column(Integer)

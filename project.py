@@ -108,20 +108,22 @@ def load_user(id):
 class EditBookForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired()])
     author = StringField('Author', validators=[DataRequired()])
-    avg_rating = StringField('Average Rating Out of 5',
+    genre = StringField('Genre',
                              validators=[DataRequired()])
     format = StringField('Format', validators=[DataRequired()])
     image = StringField('Image')
     num_pages = StringField('Pages', validators=[DataRequired()])
+    pub_date = StringField('Publication Date', validators=[DataRequired()])
     submit = SubmitField('Update')
 
 class CreateBookForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired()])
     author = StringField('Author', validators=[DataRequired()])
-    avg_rating = FloatField('Rating out of 5', validators=[DataRequired()])
+    genre = FloatField('Genre', validators=[DataRequired()])
     format = StringField('Format', validators=[DataRequired()])
     img_url = StringField('Image', validators=[DataRequired()])
     num_pages = IntegerField('Pages', validators=[DataRequired()])
+    pub_date = StringField('Publication Date', validators=[DataRequired()])
     pub_id = IntegerField('PublisherID', validators=[DataRequired()])
     submit = SubmitField('Create')
 
@@ -142,7 +144,7 @@ class Book(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(500), nullable=False, index=True)
     author = db.Column(db.String(350))
-    avg_rating = db.Column(db.Float)
+    genre = db.Column(db.String(50))
     format = db.Column(db.String(50))
     image = db.Column(db.String(250))
     num_pages = db.Column(db.Integer)
@@ -367,10 +369,11 @@ def edit_book(book_id):
     if form.validate_on_submit():
         book.title = form.title.data
         book.author = form.author.data
-        book.avg_rating = form.avg_rating.data
+        book.genre = form.genre.data
         book.format = form.format.data
         book.image = form.image.data
         book.num_pages = form.num_pages.data
+        book.pub_date = form.pub_date.data
         db.session.add(book)
         db.session.commit()
         flash('book edited successfully')
@@ -384,9 +387,9 @@ def create_book(pub_id):
     form.pub_id.data = pub_id  # pre-populates pub_id
     if form.validate_on_submit():
         book = Book(title=form.title.data, author=form.author.data,
-                    avg_rating=form.avg_rating.data,
+                    genre=form.genre.data,
                     book_format=form.format.data, image=form.img_url.data,
-                    num_pages=form.num_pages.data,
+                    num_pages=form.num_pages.data, pub_date=form.pub_date.data,
                     pub_id=form.pub_id.data)
         db.session.add(book)
         db.session.commit()
